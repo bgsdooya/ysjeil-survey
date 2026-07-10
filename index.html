@@ -194,7 +194,7 @@
 <div class="bar" id="bar">
   <div class="bar-inner">
     <div class="prog"><i id="progfill"></i></div>
-    <p class="prog-txt" id="progtxt">0 / 22 문항</p>
+    <p class="prog-txt" id="progtxt">0 / 21 문항</p>
     <button class="submit" id="submit">제출하기</button>
   </div>
 </div>
@@ -422,8 +422,8 @@ btn.addEventListener('click', async () => {
       showError('잠시 후 다시 시도해 주세요');
       btn.disabled = false; btn.textContent = '제출하기';
 } else {
-      showError('에러: ' + m);
-      btn.disabled = false; btn.textContent = '제출하기';
+      showError('제출에 실패했습니다. 잠시 후 다시 시도해 주세요');
+  btn.disabled = false; btn.textContent = '제출하기';
     }
   }
 });
@@ -432,7 +432,7 @@ btn.addEventListener('click', async () => {
    7. 진입 시 상태 확인
    ============================================================ */
 (async () => {
-  // 중복 제출 방지 (같은 기기 · 같은 반기)
+  // 중복 제출 방지 (같은 기기 · 최근 90일)
   try {
   const last = Number(localStorage.getItem(SUBMIT_KEY) || 0);
   const days = (Date.now() - last) / 86400000;
