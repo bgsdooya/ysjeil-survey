@@ -209,7 +209,8 @@
 const SUPABASE_URL  = 'https://zxommpndvpcakzxllebs.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4b21tcG5kdnBjYWt6eGxsZWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NzU5NzMsImV4cCI6MjA5OTE1MTk3M30.YGMhMk899JyJ0vmWENkHHrRtibywmw599gZlf4L-qVM';
 
-const PERIOD_KEY = 'ysjeil_survey_2026H2';   // 반기 바뀌면 이 값도 바꿀 것
+const SUBMIT_KEY   = 'ysjeil_survey_last';   // 반기 바뀌어도 수정 불필요
+const COOLDOWN_DAY = 90;    
 
 /* ============================================================
    2. 문항 정의
@@ -409,7 +410,7 @@ btn.addEventListener('click', async () => {
     const { data, error } = await sb.rpc('submit_survey', { payload });
     if (error) throw error;
 
-    try { localStorage.setItem(PERIOD_KEY, '1'); } catch(e){}
+    try { localStorage.setItem(SUBMIT_KEY, String(Date.now())); } catch(e){}
     finish('제출이 완료되었습니다',
       '소중한 의견 감사합니다.<br>더 나은 병원이 되도록 노력하겠습니다.', '✓');
 
@@ -433,11 +434,14 @@ btn.addEventListener('click', async () => {
 (async () => {
   // 중복 제출 방지 (같은 기기 · 같은 반기)
   try {
-    if (localStorage.getItem(PERIOD_KEY)) {
-      finish('이미 참여하셨습니다', '소중한 의견 감사합니다.', '✓');
-      return;
-    }
-  } catch(e){}
+  const last = Number(localStorage.getItem(SUBMIT_KEY) || 0);
+  const days = (Date.now() - last) / 86400000;
+  if (last && days < COOLDOWN_DAY) {
+    finish('이미 참여하셨습니다',
+      '최근 3개월 이내에 참여해 주셨습니다.<br>소중한 의견 감사합니다.', '✓');
+    return;
+  }
+} catch(e){}
 
   // 조사 기간 확인
   try {
