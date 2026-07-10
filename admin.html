@@ -175,6 +175,8 @@
 const SUPABASE_URL  = 'https://zxommpndvpcakzxllebs.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4b21tcG5kdnBjYWt6eGxsZWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NzU5NzMsImV4cCI6MjA5OTE1MTk3M30.YGMhMk899JyJ0vmWENkHHrRtibywmw599gZlf4L-qVM';
 
+// ⚠️ 새 회차를 시작하면 반드시 여기에 추가할 것.
+//    누락 시 해당 회차 데이터가 대시보드에 표시되지 않음.
 const PERIODS = ['2026-1기', '2027-1기', '2027-2기'];   // 반기 추가 시 여기 수정
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -194,7 +196,7 @@ const QMETA = {
 
 const TABS = [
   ['summary','요약'], ['ward','병동'], ['question','문항'],
-  ['cross','교차 분석'], ['room','치료실'], ['compare','반기 비교'], ['text','자유 의견']
+  ['cross','교차 분석'], ['room','치료실'], ['compare','회차 비교'], ['text','자유 의견']
 ];
 
 let period = PERIODS[0];
@@ -599,16 +601,16 @@ function renderCompareShell(){
   const prev = PERIODS[Math.max(0, i-1)];
 
   p.innerHTML = `
-    <h2 class="sec">반기 비교</h2>
-    <p class="note">두 기간의 문항별 평균 차이 (Δ = 현재 − 이전)</p>
+    <h2 class="sec">회차 비교</h2>
+    <p class="note">두 회차의 문항별 평균 차이 (Δ = 현재 − 이전)</p>
     <div class="cmp">
       <input id="cPrev" value="${prev}"> <span>→</span>
       <input id="cCurr" value="${period}">
       <button id="cRun">비교</button>
     </div>
     <div class="warnbox">
-      2026-H2 이전 종이 설문은 3점 척도였으므로 비교 대상이 아닙니다.
-      <b>2026-H2가 기준선(baseline)</b>입니다.
+      기존 종이 설문은 3점 척도였으므로 비교 대상이 아닙니다.
+  <b>2026-1기가 기준선(baseline)</b>입니다.
     </div>
     <div id="cmpBody"></div>`;
 
