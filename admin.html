@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>만족도 조사 대시보드 | 양산제일병원</title>
+<style>
+  :root{
+    --bg:#f2f4f6; --card:#fff; --line:#e2e6ea; --line2:#ccd2d8;
+    --txt:#1a1f24; --txt2:#5c646d; --txt3:#8d949b;
+    --navy:#1b5a8e; --navy-bg:#e9f1f8;
+    --teal:#1a8fa8; --green:#3f9c4f; --orange:#e8842a; --red:#c0392b;
+    --r:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  .hide{display:none !important;}
+
+  /* ---------- 로그인 ---------- */
+  #login{max-width:380px; margin:14vh auto; padding:0 20px;}
+  #login .box{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:30px 26px;}
+  #login h1{font-size:19px; margin:0 0 4px; text-align:center;}
+  #login .sub{font-size:13px; color:var(--txt2); text-align:center; margin:0 0 24px;}
+  #login label{display:block; font-size:13px; font-weight:600; margin:14px 0 6px;}
+  #login input{
+    width:100%; padding:12px; font-size:15px; border:1.5px solid var(--line2);
+    border-radius:8px; font-family:inherit;
+  }
+  #login input:focus{outline:none; border-color:var(--navy);}
+  #login button{
+    width:100%; margin-top:22px; padding:13px; border:none; border-radius:8px;
+    background:var(--navy); color:#fff; font-size:15px; font-weight:600;
+    font-family:inherit; cursor:pointer;
+  }
+  #login button:disabled{background:var(--line2);}
+  .alert{background:#fdeceb; color:var(--red); font-size:13px; padding:10px 12px;
+    border-radius:8px; margin-top:14px; text-align:center;}
+
+  /* ---------- 헤더 ---------- */
+  header{
+    background:var(--card); border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+  }
+  .hd{max-width:1180px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px;}
+  .hd h1{font-size:16px; font-weight:700; margin:0; flex:1;}
+  .hd h1 small{display:block; font-size:12px; color:var(--txt3); font-weight:400;}
+  .hd select, .hd button{
+    padding:8px 12px; font-size:13px; border:1.5px solid var(--line2);
+    border-radius:7px; background:#fff; font-family:inherit; cursor:pointer; color:var(--txt);
+  }
+  .hd button.out{border-color:var(--line); color:var(--txt2);}
+
+  nav{max-width:1180px; margin:0 auto; padding:0 12px; display:flex; gap:2px; overflow-x:auto;}
+  nav button{
+    padding:11px 15px; border:none; background:none; font-size:14px; font-family:inherit;
+    color:var(--txt2); cursor:pointer; white-space:nowrap; border-bottom:2.5px solid transparent;
+  }
+  nav button.on{color:var(--navy); font-weight:700; border-bottom-color:var(--navy);}
+
+  main{max-width:1180px; margin:0 auto; padding:22px 20px 60px;}
+  .pane{display:none;} .pane.on{display:block;}
+
+  h2.sec{font-size:15px; margin:0 0 3px;}
+  p.note{font-size:12.5px; color:var(--txt3); margin:0 0 14px;}
+
+  /* ---------- 카드 ---------- */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:12px; margin-bottom:26px;}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
+  .kpi .k{font-size:12px; color:var(--txt2); margin:0 0 6px;}
+  .kpi .v{font-size:28px; font-weight:700; line-height:1.1; margin:0; letter-spacing:-.02em;}
+  .kpi .v span{font-size:14px; font-weight:500; color:var(--txt3); margin-left:2px;}
+  .kpi .d{font-size:11.5px; color:var(--txt3); margin:5px 0 0;}
+
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; margin-bottom:16px;}
+  .panel h3{font-size:14px; margin:0 0 3px;}
+  .panel .sub{font-size:12px; color:var(--txt3); margin:0 0 16px;}
+
+  /* ---------- 표 ---------- */
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th, td{padding:10px 8px; text-align:center; border-bottom:1px solid var(--line);}
+  th{font-size:12px; font-weight:600; color:var(--txt2); background:#fafbfc;}
+  th:first-child, td:first-child{text-align:left; padding-left:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.mask{color:var(--txt3); cursor:help;}
+  .cell{display:inline-block; min-width:52px; padding:5px 0; border-radius:5px; font-weight:600;}
+
+  .qname{text-align:left; font-size:13px;}
+  .qtag{
+    display:inline-block; font-size:10.5px; font-weight:700; padding:2px 6px;
+    border-radius:4px; background:var(--navy-bg); color:var(--navy); margin-right:7px;
+  }
+  .bar{height:7px; background:var(--line); border-radius:4px; overflow:hidden; min-width:80px;}
+  .bar i{display:block; height:100%; background:var(--navy);}
+
+  .delta.up{color:var(--green); font-weight:600;}
+  .delta.dn{color:var(--red); font-weight:600;}
+  .delta.eq{color:var(--txt3);}
+
+  .chips{display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;}
+  .chip{
+    padding:7px 14px; border:1.5px solid var(--line2); border-radius:20px;
+    font-size:13px; cursor:pointer; background:#fff; color:var(--txt2); font-family:inherit;
+  }
+  .chip.on{background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600;}
+
+  .cmp{display:flex; gap:8px; align-items:center; margin-bottom:16px; flex-wrap:wrap;}
+  .cmp input{padding:8px 10px; font-size:13px; border:1.5px solid var(--line2); border-radius:7px;
+    width:110px; font-family:ui-monospace,Menlo,monospace;}
+  .cmp button{padding:8px 16px; border:none; border-radius:7px; background:var(--navy);
+    color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;}
+  .cmp span{font-size:13px; color:var(--txt3);}
+
+  .txtitem{border-bottom:1px solid var(--line); padding:14px 2px;}
+  .txtitem:last-child{border-bottom:none;}
+  .txtitem .meta{font-size:11.5px; color:var(--txt3); margin-bottom:5px;}
+  .txtitem .meta b{color:var(--txt2); font-weight:600;}
+  .txtitem p{margin:0; font-size:14px; line-height:1.7; white-space:pre-wrap;}
+  .score{display:inline-block; padding:1px 7px; border-radius:4px; font-weight:700; font-size:11px;}
+
+  .empty{text-align:center; padding:56px 20px; color:var(--txt3); font-size:14px;}
+  canvas{max-height:320px;}
+  .warnbox{background:#fff8ec; border:1px solid #f0d9ac; color:#7d5310;
+    font-size:12.5px; padding:11px 14px; border-radius:8px; margin-bottom:16px;}
+</style>
+</head>
+<body>
+
+<!-- ================= 로그인 ================= -->
+<div id="login">
+  <div class="box">
+    <h1>만족도 조사 대시보드</h1>
+    <p class="sub">양산제일병원 · 관리자 전용</p>
+    <label>이메일</label>
+    <input type="email" id="email" autocomplete="username">
+    <label>비밀번호</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button id="loginBtn">로그인</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ================= 대시보드 ================= -->
+<div id="dash" class="hide">
+  <header>
+    <div class="hd">
+      <h1>퇴원 환자 만족도 조사<small>양산제일병원</small></h1>
+      <select id="period"></select>
+      <button class="out" id="logout">로그아웃</button>
+    </div>
+    <nav id="nav"></nav>
+  </header>
+
+  <main>
+    <div class="pane on" data-p="summary"></div>
+    <div class="pane" data-p="ward"></div>
+    <div class="pane" data-p="question"></div>
+    <div class="pane" data-p="cross"></div>
+    <div class="pane" data-p="room"></div>
+    <div class="pane" data-p="compare"></div>
+    <div class="pane" data-p="text"></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+/* ============================================================
+   설정 — index.html 과 동일한 값
+   ============================================================ */
+const SUPABASE_URL  = 'https://zxommpndvpcakzxllebs.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4b21tcG5kdnBjYWt6eGxsZWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NzU5NzMsImV4cCI6MjA5OTE1MTk3M30.YGMhMk899JyJ0vmWENkHHrRtibywmw599gZlf4L-qVM';
+
+const PERIODS = ['2026-H2', '2027-H1', '2027-H2'];   // 반기 추가 시 여기 수정
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* ============================================================
+   문항 메타
+   ============================================================ */
+const QMETA = {
+  q1:['진료','주치의 상태 설명'],      q2:['진료','치료계획·검사결과 설명'],
+  q3:['간호','간호사 친절'],           q4:['간호','간호사 질문 응대'],
+  q5:['원무','원무 직원 친절'],        q6:['원무','입·퇴원 수속 신속·편리'],
+  q7:['치료','치료 내용 만족'],        q8:['치료','치료사 친절'],
+  q9:['치료','치료 시간 충분'],        q10:['영양','병원 식사'],
+  q11:['환경','공동생활환경 청결'],    q12:['퇴원','퇴원 안내 충분'],
+  q13:['전반','전반적 서비스 만족']
+};
+
+const TABS = [
+  ['summary','요약'], ['ward','병동'], ['question','문항'],
+  ['cross','교차 분석'], ['room','치료실'], ['compare','반기 비교'], ['text','자유 의견']
+];
+
+let period = PERIODS[0];
+let charts = {};
+
+/* ============================================================
+   유틸
+   ============================================================ */
+const $  = s => document.querySelector(s);
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+const pane = p => document.querySelector(`.pane[data-p="${p}"]`);
+
+// 1~5 점수 → 배경색
+function scoreColor(v){
+  if (v == null) return '#f4f5f7';
+  if (v >= 4.5) return '#dff3e3';
+  if (v >= 4.0) return '#eaf6ec';
+  if (v >= 3.5) return '#fff6e5';
+  if (v >= 3.0) return '#ffeedb';
+  return '#fdeceb';
+}
+function scoreText(v){
+  if (v == null) return 'var(--txt3)';
+  if (v >= 4.0) return '#1e6b34';
+  if (v >= 3.5) return '#8a5a12';
+  if (v >= 3.0) return '#a35410';
+  return '#a02b1e';
+}
+const fmt = v => (v == null || v === undefined) ? '–' : v;
+
+function killCharts(){
+  Object.values(charts).forEach(c => c && c.destroy());
+  charts = {};
+}
+function emptyMsg(msg){
+  return `<div class="empty">${msg}</div>`;
+}
+
+/* ============================================================
+   로그인
+   ============================================================ */
+$('#loginBtn').addEventListener('click', doLogin);
+$('#pw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+async function doLogin(){
+  const btn = $('#loginBtn');
+  $('#loginErr').innerHTML = '';
+  btn.disabled = true; btn.textContent = '확인 중…';
+
+  const { error } = await sb.auth.signInWithPassword({
+    email: $('#email').value.trim(),
+    password: $('#pw').value
+  });
+
+  if (error){
+    $('#loginErr').innerHTML = `<div class="alert">로그인에 실패했습니다</div>`;
+    btn.disabled = false; btn.textContent = '로그인';
+    return;
+  }
+  await enter();
+}
+
+$('#logout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  location.reload();
+});
+
+async function enter(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const role = session.user?.app_metadata?.role;
+  if (role !== 'admin'){
+    $('#loginErr').innerHTML =
+      `<div class="alert">관리자 권한이 없습니다.<br>
+       권한을 방금 부여했다면 로그아웃 후 다시 로그인하세요.</div>`;
+    $('#loginBtn').disabled = false;
+    $('#loginBtn').textContent = '로그인';
+    await sb.auth.signOut();
+    return;
+  }
+
+  $('#login').classList.add('hide');
+  $('#dash').classList.remove('hide');
+
+  // 반기 셀렉트
+  const sel = $('#period');
+  sel.innerHTML = PERIODS.map(p => `<option value="${p}">${p}</option>`).join('');
+  sel.addEventListener('change', () => { period = sel.value; render(); });
+
+  // 탭
+  const nav = $('#nav');
+  nav.innerHTML = TABS.map(([k,l],i) =>
+    `<button data-t="${k}" class="${i===0?'on':''}">${l}</button>`).join('');
+  nav.addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    nav.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.querySelectorAll('.pane').forEach(x=>x.classList.remove('on'));
+    pane(b.dataset.t).classList.add('on');
+  });
+
+  render();
+}
+
+/* ============================================================
+   렌더 전체
+   ============================================================ */
+async function render(){
+  killCharts();
+  await Promise.all([
+    renderSummary(), renderWard(), renderQuestion(),
+    renderCross(), renderRoom(), renderText()
+  ]);
+  renderCompareShell();
+}
+
+/* ---------- 1. 요약 ---------- */
+async function renderSummary(){
+  const p = pane('summary');
+  const { data, error } = await sb.rpc('admin_summary', { p_period: period });
+
+  if (error || !data || !data.n){
+    p.innerHTML = `<h2 class="sec">요약</h2><p class="note">${period}</p>` +
+      emptyMsg(error ? '데이터를 불러오지 못했습니다' : '아직 응답이 없습니다');
+    return;
+  }
+
+  const nps = data.nps;
+  const npsColor = nps >= 50 ? 'var(--green)' : nps >= 0 ? 'var(--orange)' : 'var(--red)';
+
+  p.innerHTML = `
+    <h2 class="sec">요약</h2>
+    <p class="note">${period} · 전체 응답 기준</p>
+    <div class="cards">
+      <div class="kpi"><p class="k">총 응답</p><p class="v">${data.n}<span>건</span></p>
+        <p class="d">기간 내 누적</p></div>
+      <div class="kpi"><p class="k">전체 평균</p><p class="v">${fmt(data.avg_score)}<span>/ 5</span></p>
+        <p class="d">13문항 단순 평균</p></div>
+      <div class="kpi"><p class="k">Top-2 Box</p><p class="v">${fmt(data.top2_box)}<span>%</span></p>
+        <p class="d">평균 4점 이상 응답 비율</p></div>
+      <div class="kpi"><p class="k">NPS</p>
+        <p class="v" style="color:${npsColor}">${fmt(nps)}</p>
+        <p class="d">추천(9–10) − 비추천(0–6)</p></div>
+      <div class="kpi"><p class="k">낙상교육 이행률</p><p class="v">${fmt(data.fall_edu_rate)}<span>%</span></p>
+        <p class="d">"예" 응답 비율</p></div>
+      <div class="kpi"><p class="k">보조 응답 비율</p><p class="v">${fmt(data.assisted_rate)}<span>%</span></p>
+        <p class="d">직원 대면 보조</p></div>
+    </div>
+
+    ${data.n < 30 ? `<div class="warnbox">
+      응답이 ${data.n}건입니다. 30건 미만에서는 병동·연령별 세부 지표가
+      표본 오차에 크게 흔들립니다. 추세 판단에만 참고하세요.
+    </div>` : ''}
+
+    <div class="panel">
+      <h3>Top-2 Box를 우선 보세요</h3>
+      <p class="sub">평균 3.8 → 3.9는 노이즈와 구분되지 않습니다.
+        4·5점 응답 비율의 이동이 실제 개선 신호입니다.</p>
+    </div>`;
+}
+
+/* ---------- 2. 병동 히트맵 ---------- */
+async function renderWard(){
+  const p = pane('ward');
+  const { data, error } = await sb.rpc('admin_ward_matrix', { p_period: period });
+
+  if (error || !data || !data.length){
+    p.innerHTML = `<h2 class="sec">병동별 히트맵</h2>` +
+      emptyMsg(error ? '불러오지 못했습니다' : '아직 응답이 없습니다');
+    return;
+  }
+
+  const cats = ['진료','간호','원무','치료','영양','환경','퇴원','전반'];
+  const rows = data.map(r => `
+    <tr>
+      <td><b>${r.ward}병동</b></td>
+      <td>${r.n}</td>
+      ${cats.map(c => {
+        const v = r[c];
+        return v == null
+          ? `<td class="mask" title="응답 5건 미만은 개인 식별 방지를 위해 표시하지 않습니다">–</td>`
+          : `<td><span class="cell" style="background:${scoreColor(v)};color:${scoreText(v)}">${v}</span></td>`;
+      }).join('')}
+    </tr>`).join('');
+
+  p.innerHTML = `
+    <h2 class="sec">병동별 히트맵</h2>
+    <p class="note">${period} · 항목별 평균 (5점 만점)</p>
+    <div class="warnbox">
+      셀 응답수가 5건 미만이면 개인 식별 방지를 위해 <b>–</b> 로 표시됩니다.
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>병동</th><th>n</th>${cats.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ---------- 3. 문항별 ---------- */
+async function renderQuestion(){
+  const p = pane('question');
+  const { data, error } = await sb.rpc('admin_question_stats', { p_period: period });
+
+  if (error || !data || !data.length){
+    p.innerHTML = `<h2 class="sec">문항별 점수</h2>` +
+      emptyMsg(error ? '불러오지 못했습니다' : '아직 응답이 없습니다');
+    return;
+  }
+
+  // 낮은 순 정렬 — 개선 대상이 위로
+  const sorted = [...data].sort((a,b) => a.avg_score - b.avg_score);
+
+  const rows = sorted.map(r => {
+    const [cat, label] = QMETA[r.q] || ['','?'];
+    return `<tr>
+      <td class="qname"><span class="qtag">${cat}</span>${label}</td>
+      <td><span class="cell" style="background:${scoreColor(r.avg_score)};color:${scoreText(r.avg_score)}">${r.avg_score}</span></td>
+      <td>${r.top2}%</td>
+      <td style="width:34%"><div class="bar"><i style="width:${r.top2}%"></i></div></td>
+    </tr>`;
+  }).join('');
+
+  p.innerHTML = `
+    <h2 class="sec">문항별 점수</h2>
+    <p class="note">${period} · <b>점수가 낮은 순</b>으로 정렬 — 위쪽이 개선 대상</p>
+    <div class="panel">
+      <h3>Top-2 Box 분포</h3>
+      <p class="sub">4점 이상 응답 비율</p>
+      <canvas id="chQ"></canvas>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>문항</th><th>평균</th><th>Top-2</th><th>　</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  charts.q = new Chart($('#chQ'), {
+    type:'bar',
+    data:{
+      labels: sorted.map(r => QMETA[r.q]?.[1] || r.q),
+      datasets:[{
+        data: sorted.map(r => r.top2),
+        backgroundColor: sorted.map(r => r.avg_score >= 4 ? '#3f9c4f' : r.avg_score >= 3.5 ? '#e8842a' : '#c0392b'),
+        borderRadius:4, barThickness:16
+      }]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`Top-2 ${c.parsed.x}%`}} },
+      scales:{ x:{ max:100, ticks:{callback:v=>v+'%'} }, y:{ ticks:{font:{size:11}} } }
+    }
+  });
+  $('#chQ').style.height = (sorted.length * 26 + 40) + 'px';
+}
+
+/* ---------- 4. 교차 분석 ---------- */
+const DIMS = [
+  ['age_group','연령'], ['stay_length','재원 기간'],
+  ['dept','진료과'], ['referral','입원 경로']
+];
+let dim = 'age_group';
+
+async function renderCross(){
+  const p = pane('cross');
+  p.innerHTML = `
+    <h2 class="sec">교차 분석</h2>
+    <p class="note">${period} · 응답 5건 미만 구간은 표시하지 않습니다</p>
+    <div class="chips">${DIMS.map(([k,l])=>
+      `<button class="chip ${k===dim?'on':''}" data-d="${k}">${l}</button>`).join('')}</div>
+    <div id="crossBody"></div>`;
+
+  p.querySelector('.chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if(!b) return;
+    dim = b.dataset.d;
+    p.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    loadCross();
+  });
+  await loadCross();
+}
+
+async function loadCross(){
+  const box = $('#crossBody');
+  box.innerHTML = `<div class="empty">불러오는 중…</div>`;
+  const { data, error } = await sb.rpc('admin_breakdown', { p_period: period, p_dimension: dim });
+
+  if (error || !data || !data.length){
+    box.innerHTML = emptyMsg(error ? '불러오지 못했습니다' : '아직 응답이 없습니다');
+    return;
+  }
+
+  const rows = data.map(r => `
+    <tr>
+      <td><b>${r.bucket}</b></td>
+      <td>${r.n}</td>
+      <td>${r.avg_score == null ? `<span class="mask" title="응답 5건 미만">–</span>`
+        : `<span class="cell" style="background:${scoreColor(r.avg_score)};color:${scoreText(r.avg_score)}">${r.avg_score}</span>`}</td>
+      <td>${r.top2 == null ? '–' : r.top2 + '%'}</td>
+      <td>${r.nps == null ? '–' : r.nps}</td>
+    </tr>`).join('');
+
+  if (charts.cross) charts.cross.destroy();
+
+  box.innerHTML = `
+    <div class="panel">
+      <h3>응답 수 · 평균</h3>
+      <p class="sub">막대 = 응답 수 · 선 = 평균 점수</p>
+      <canvas id="chC"></canvas>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>구간</th><th>n</th><th>평균</th><th>Top-2</th><th>NPS</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  charts.cross = new Chart($('#chC'), {
+    data:{
+      labels: data.map(r=>r.bucket),
+      datasets:[
+        { type:'bar', label:'응답 수', data:data.map(r=>r.n),
+          backgroundColor:'#cfe0ee', borderRadius:4, yAxisID:'y', order:2 },
+        { type:'line', label:'평균 점수', data:data.map(r=>r.avg_score),
+          borderColor:'#1b5a8e', backgroundColor:'#1b5a8e', tension:.25,
+          spanGaps:true, yAxisID:'y1', order:1, pointRadius:4 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}} },
+      scales:{
+        y:{ position:'left', beginAtZero:true, title:{display:true,text:'응답 수',font:{size:10}} },
+        y1:{ position:'right', min:1, max:5, grid:{drawOnChartArea:false},
+             title:{display:true,text:'평균',font:{size:10}} }
+      }
+    }
+  });
+}
+
+/* ---------- 5. 치료실 ---------- */
+async function renderRoom(){
+  const p = pane('room');
+  const { data, error } = await sb.rpc('admin_room_usage', { p_period: period });
+
+  if (error || !data || !data.length){
+    p.innerHTML = `<h2 class="sec">치료실 이용 분포</h2>` +
+      emptyMsg(error ? '불러오지 못했습니다' : '아직 응답이 없습니다');
+    return;
+  }
+
+  const rows = data.map(r => `
+    <tr>
+      <td><b>${r.room}</b></td>
+      <td>${r.users}</td>
+      <td>${r.share}%</td>
+      <td>${r.avg_treat == null ? `<span class="mask" title="응답 5건 미만">–</span>`
+        : `<span class="cell" style="background:${scoreColor(r.avg_treat)};color:${scoreText(r.avg_treat)}">${r.avg_treat}</span>`}</td>
+    </tr>`).join('');
+
+  p.innerHTML = `
+    <h2 class="sec">치료실 이용 분포</h2>
+    <p class="note">${period} · 중복 선택이므로 비율 합계는 100%를 넘습니다</p>
+    <div class="warnbox">
+      치료 만족도(Q7·Q8·Q9 평균)는 <b>해당 치료실을 이용한 응답자 전체</b>의 값입니다.
+      한 환자가 여러 실을 이용하므로 <b>실별 성과 비교 지표로 쓰면 안 됩니다.</b>
+    </div>
+    <div class="panel">
+      <h3>이용률</h3>
+      <p class="sub">전체 응답자 대비</p>
+      <canvas id="chR" style="max-height:260px"></canvas>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>치료실</th><th>이용자</th><th>이용률</th><th>치료 만족도</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  charts.room = new Chart($('#chR'), {
+    type:'bar',
+    data:{
+      labels: data.map(r=>r.room),
+      datasets:[{ data:data.map(r=>r.share),
+        backgroundColor:['#1a8fa8','#e8842a','#3f9c4f','#1b5a8e'],
+        borderRadius:5, barThickness:34 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y+'%'}} },
+      scales:{ y:{ beginAtZero:true, ticks:{callback:v=>v+'%'} } }
+    }
+  });
+}
+
+/* ---------- 6. 반기 비교 ---------- */
+function renderCompareShell(){
+  const p = pane('compare');
+  const i = PERIODS.indexOf(period);
+  const prev = PERIODS[Math.max(0, i-1)];
+
+  p.innerHTML = `
+    <h2 class="sec">반기 비교</h2>
+    <p class="note">두 기간의 문항별 평균 차이 (Δ = 현재 − 이전)</p>
+    <div class="cmp">
+      <input id="cPrev" value="${prev}"> <span>→</span>
+      <input id="cCurr" value="${period}">
+      <button id="cRun">비교</button>
+    </div>
+    <div class="warnbox">
+      2026-H2 이전 종이 설문은 3점 척도였으므로 비교 대상이 아닙니다.
+      <b>2026-H2가 기준선(baseline)</b>입니다.
+    </div>
+    <div id="cmpBody"></div>`;
+
+  $('#cRun').addEventListener('click', loadCompare);
+}
+
+async function loadCompare(){
+  const box = $('#cmpBody');
+  const a = $('#cPrev').value.trim(), b = $('#cCurr').value.trim();
+  box.innerHTML = `<div class="empty">불러오는 중…</div>`;
+
+  const { data, error } = await sb.rpc('admin_period_compare', { p_prev:a, p_curr:b });
+  if (error || !data || !data.length){
+    box.innerHTML = emptyMsg('비교할 데이터가 없습니다');
+    return;
+  }
+  const valid = data.filter(r => r.prev_avg != null || r.curr_avg != null);
+  if (!valid.length){ box.innerHTML = emptyMsg('비교할 데이터가 없습니다'); return; }
+
+  const rows = valid.map(r => {
+    const d = r.delta;
+    const cls = d == null ? 'eq' : d > 0.05 ? 'up' : d < -0.05 ? 'dn' : 'eq';
+    const sign = d == null ? '–' : (d > 0 ? '▲ +' + d.toFixed(2) : d < 0 ? '▼ ' + d.toFixed(2) : '– 0.00');
+    const [cat,label] = QMETA[r.q] || ['','?'];
+    return `<tr>
+      <td class="qname"><span class="qtag">${cat}</span>${label}</td>
+      <td>${fmt(r.prev_avg)}</td>
+      <td>${fmt(r.curr_avg)}</td>
+      <td class="delta ${cls}">${sign}</td>
+    </tr>`;
+  }).join('');
+
+  if (charts.cmp) charts.cmp.destroy();
+
+  box.innerHTML = `
+    <div class="panel">
+      <h3>문항별 변화</h3>
+      <p class="sub">${a} → ${b}</p>
+      <canvas id="chCmp"></canvas>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>문항</th><th>${a}</th><th>${b}</th><th>Δ</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  charts.cmp = new Chart($('#chCmp'), {
+    type:'bar',
+    data:{
+      labels: valid.map(r => QMETA[r.q]?.[1] || r.q),
+      datasets:[
+        { label:a, data:valid.map(r=>r.prev_avg), backgroundColor:'#cfd6dd', borderRadius:3 },
+        { label:b, data:valid.map(r=>r.curr_avg), backgroundColor:'#1b5a8e', borderRadius:3 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}} },
+      scales:{ y:{ min:1, max:5 }, x:{ ticks:{font:{size:10}} } }
+    }
+  });
+  $('#chCmp').style.height = '340px';
+}
+
+/* ---------- 7. 자유 의견 ---------- */
+async function renderText(){
+  const p = pane('text');
+  const { data, error } = await sb.rpc('admin_free_text', { p_period: period, p_limit: 200 });
+
+  if (error || !data || !data.length){
+    p.innerHTML = `<h2 class="sec">자유 의견</h2>` +
+      emptyMsg(error ? '불러오지 못했습니다' : '작성된 의견이 없습니다');
+    return;
+  }
+
+  const items = data.map(r => {
+    const d = new Date(r.created_at);
+    const ds = `${d.getMonth()+1}/${d.getDate()}`;
+    const sc = r.avg_score;
+    return `<div class="txtitem">
+      <p class="meta">
+        <b>${r.ward}병동</b> · ${r.dept} · ${r.age_group} · ${ds}
+        <span class="score" style="background:${scoreColor(sc)};color:${scoreText(sc)}">평균 ${sc}</span>
+      </p>
+      <p>${(r.free_text||'').replace(/</g,'&lt;')}</p>
+    </div>`;
+  }).join('');
+
+  p.innerHTML = `
+    <h2 class="sec">자유 의견</h2>
+    <p class="note">${period} · ${data.length}건 · 최근 순</p>
+    <div class="warnbox">
+      개인정보(이름·연락처)나 특정 직원 실명이 포함된 응답은
+      <b>사전에 정한 기준에 따라 처리</b>하십시오. 이 화면은 열람 기록이 남습니다.
+    </div>
+    <div class="panel">${items}</div>`;
+}
+
+/* ============================================================
+   진입
+   ============================================================ */
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) await enter();
+})();
+</script>
+</body>
+</html>
