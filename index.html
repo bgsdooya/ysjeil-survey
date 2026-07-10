@@ -433,7 +433,7 @@ btn.addEventListener('click', async () => {
 (async () => {
   // 중복 제출 방지 (같은 기기 · 같은 반기)
   try {
-    if (localStorage.getItem(PERIOD_KEY) && !state.assisted) {
+    if (localStorage.getItem(PERIOD_KEY)) {
       finish('이미 참여하셨습니다', '소중한 의견 감사합니다.', '✓');
       return;
     }
