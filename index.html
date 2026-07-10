@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
+<title>퇴원 환자 만족도 조사 | 양산제일병원</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --line:#e3e6ea; --line2:#cfd4da;
+    --txt:#1c1f23; --txt2:#5b6169; --txt3:#8b9198;
+    --pri:#1f6feb; --pri-bg:#e8f1fe; --pri-line:#9dc2f7;
+    --err:#c0392b; --err-bg:#fdeceb;
+    --ok:#1e8e5a;
+    --r:10px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    font-size:16px; line-height:1.6; padding-bottom:96px;
+  }
+  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+
+  header{background:var(--card); border-radius:var(--r); padding:24px 20px; text-align:center; margin-bottom:14px; border:1px solid var(--line);}
+  header h1{font-size:20px; font-weight:600; margin:0 0 10px;}
+  header p{font-size:13px; color:var(--txt2); margin:0; line-height:1.7;}
+  .badge{display:inline-block; background:var(--pri-bg); color:var(--pri); font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:12px;}
+
+  section{background:var(--card); border-radius:var(--r); padding:18px 16px; margin-bottom:14px; border:1px solid var(--line);}
+  .sec-title{font-size:13px; font-weight:700; color:var(--pri); margin:0 0 4px; letter-spacing:.02em;}
+  .sec-desc{font-size:12px; color:var(--txt3); margin:0 0 16px;}
+
+  .q{padding:14px 0; border-top:1px solid var(--line);}
+  .q:first-of-type{border-top:none; padding-top:0;}
+  .q.miss{background:var(--err-bg); margin:0 -16px; padding-left:16px; padding-right:16px; border-radius:6px;}
+  .q-label{font-size:15px; margin:0 0 10px; display:flex; gap:8px; align-items:flex-start;}
+  .q-num{font-size:11px; font-weight:700; color:var(--pri); background:var(--pri-bg); padding:3px 7px; border-radius:5px; flex-shrink:0; margin-top:2px;}
+  .q-hint{font-size:12px; color:var(--txt3); margin:-4px 0 10px;}
+
+  .opts{display:grid; gap:7px;}
+  .opts.c2{grid-template-columns:1fr 1fr;}
+  .opts.c3{grid-template-columns:repeat(3,1fr);}
+  .opts.c5{grid-template-columns:repeat(5,1fr);}
+  .opts.c11{grid-template-columns:repeat(11,1fr); gap:3px;}
+
+  .opt{
+    min-height:48px; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:10px 8px; border:1.5px solid var(--line2);
+    border-radius:var(--r); background:#fff; color:var(--txt2);
+    font-size:14px; cursor:pointer; user-select:none; transition:.08s;
+  }
+  .opt.sm{font-size:13px; padding:8px 4px;}
+  .opt.tiny{min-height:44px; font-size:13px; padding:8px 0; border-radius:6px;}
+  .opt:active{transform:scale(.97);}
+  .opt.on{background:var(--pri); border-color:var(--pri); color:#fff; font-weight:600;}
+  .opt .sub{display:block; font-size:11px; opacity:.7; margin-top:1px;}
+
+  .scale-legend{display:flex; justify-content:space-between; font-size:11px; color:var(--txt3); margin-top:5px;}
+
+  textarea{
+    width:100%; border:1.5px solid var(--line2); border-radius:var(--r);
+    padding:12px; font-size:15px; font-family:inherit; resize:vertical; min-height:96px;
+    color:var(--txt); background:#fff;
+  }
+  textarea:focus{outline:none; border-color:var(--pri);}
+  .warn{font-size:12px; color:var(--err); margin:8px 0 0;}
+
+  .bar{
+    position:fixed; left:0; right:0; bottom:0; background:var(--card);
+    border-top:1px solid var(--line); padding:10px 16px 14px; z-index:10;
+  }
+  .bar-inner{max-width:520px; margin:0 auto;}
+  .prog{height:5px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:9px;}
+  .prog i{display:block; height:100%; width:0; background:var(--pri); transition:width .2s;}
+  .prog-txt{font-size:12px; color:var(--txt2); text-align:center; margin-bottom:9px;}
+  button.submit{
+    width:100%; min-height:52px; border:none; border-radius:var(--r);
+    background:var(--pri); color:#fff; font-size:16px; font-weight:600;
+    font-family:inherit; cursor:pointer;
+  }
+  button.submit:disabled{background:var(--line2); cursor:not-allowed;}
+  button.submit:active:not(:disabled){transform:scale(.99);}
+
+  .msg{text-align:center; padding:60px 24px;}
+  .msg .ico{font-size:52px; margin-bottom:16px;}
+  .msg h2{font-size:20px; margin:0 0 10px;}
+  .msg p{font-size:14px; color:var(--txt2); margin:0; line-height:1.8;}
+  .hide{display:none !important;}
+  .err-line{background:var(--err-bg); color:var(--err); font-size:13px; padding:10px 12px; border-radius:8px; margin-bottom:10px; text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="app" class="wrap">
+
+  <header>
+    <div class="badge">완전 익명 조사</div>
+    <h1>퇴원 환자 만족도 조사</h1>
+    <p>
+      개인을 식별할 수 있는 정보는 일절 수집하지 않습니다.<br>
+      응답은 통계 목적으로만 사용되며,<br>
+      담당 의료진에게 개별 응답이 전달되지 않습니다.<br>
+      <b style="color:var(--txt)">소요 시간 약 2분</b>
+    </p>
+  </header>
+
+  <div id="errbox"></div>
+
+  <!-- STEP 1 -->
+  <section>
+    <p class="sec-title">STEP 1 · 기본 정보</p>
+    <p class="sec-desc">해당하는 항목을 눌러 주세요</p>
+
+    <div class="q" data-key="ward">
+      <p class="q-label"><span class="q-num">B1</span>입원하셨던 병동</p>
+      <div class="opts c3" data-single></div>
+    </div>
+
+    <div class="q" data-key="dept">
+      <p class="q-label"><span class="q-num">B2</span>진료과</p>
+      <div class="opts c2" data-single></div>
+    </div>
+
+    <div class="q" data-key="sex">
+      <p class="q-label"><span class="q-num">B3</span>성별</p>
+      <div class="opts c2" data-single></div>
+    </div>
+
+    <div class="q" data-key="age_group">
+      <p class="q-label"><span class="q-num">B4</span>연령</p>
+      <div class="opts c3" data-single></div>
+    </div>
+
+    <div class="q" data-key="stay_length">
+      <p class="q-label"><span class="q-num">B5</span>입원 기간</p>
+      <div class="opts c3" data-single></div>
+    </div>
+
+    <div class="q" data-key="referral">
+      <p class="q-label"><span class="q-num">B6</span>본원에 입원하시게 된 경로</p>
+      <div class="opts" data-single></div>
+    </div>
+
+    <div class="q" data-key="rooms">
+      <p class="q-label"><span class="q-num">B7</span>입원 중 이용하신 치료실</p>
+      <p class="q-hint">해당되는 곳을 모두 선택해 주세요 · 이용하지 않으셨으면 넘어가셔도 됩니다</p>
+      <div class="opts c2" data-multi></div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section>
+    <p class="sec-title">STEP 2 · 만족도 평가</p>
+    <p class="sec-desc">1 매우 불만족 · 2 불만족 · 3 보통 · 4 만족 · 5 매우 만족</p>
+    <div id="likert"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section>
+    <p class="sec-title">STEP 3 · 추천 의향</p>
+    <p class="sec-desc">&nbsp;</p>
+    <div class="q" data-key="nps">
+      <p class="q-label"><span class="q-num">N1</span>주위 분들이 입원이 필요할 때, 양산제일병원을 추천하시겠습니까?</p>
+      <div class="opts c11" data-single></div>
+      <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section>
+    <p class="sec-title">STEP 4 · 안전 교육 확인</p>
+    <p class="sec-desc">&nbsp;</p>
+    <div class="q" data-key="fall_edu">
+      <p class="q-label"><span class="q-num">S1</span>입원 기간 중 낙상 예방 교육을 받으셨습니까?</p>
+      <div class="opts c3" data-single></div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section>
+    <p class="sec-title">STEP 5 · 자유 의견 <span style="color:var(--txt3); font-weight:400;">(선택)</span></p>
+    <p class="sec-desc">개선이 필요한 점이나 좋았던 점을 자유롭게 적어 주십시오</p>
+    <textarea id="free_text" maxlength="1000" placeholder="이름, 연락처 등 개인정보는 입력하지 말아 주세요"></textarea>
+    <p class="warn">※ 개인정보는 입력하지 말아 주세요</p>
+  </section>
+
+  <p style="text-align:center; font-size:12px; color:var(--txt3); line-height:1.8; margin:20px 0 0;">
+    항상 환자의 입장에서 생각하고 행동하는<br>양산제일병원이 되겠습니다
+  </p>
+</div>
+
+<div class="bar" id="bar">
+  <div class="bar-inner">
+    <div class="prog"><i id="progfill"></i></div>
+    <p class="prog-txt" id="progtxt">0 / 22 문항</p>
+    <button class="submit" id="submit">제출하기</button>
+  </div>
+</div>
+
+<div id="done" class="hide"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ============================================================
+   1. 설정 — 아래 두 줄만 채우세요
+   ============================================================ */
+const SUPABASE_URL  = 'https://zxommpndvpcakzxll.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4b21tcG5kdnBjYWt6eGxsZWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NzU5NzMsImV4cCI6MjA5OTE1MTk3M30.YGMhMk899JyJ0vmWENkHHrRtibywmw599gZlf4L-qVM';
+
+const PERIOD_KEY = 'ysjeil_survey_2026H2';   // 반기 바뀌면 이 값도 바꿀 것
+
+/* ============================================================
+   2. 문항 정의
+   ============================================================ */
+const CHOICES = {
+  ward:        [['5','5병동'],['6','6병동'],['7','7병동']],
+  dept:        [['내과','내과','1·2·3·7과'],['정형외과','정형외과'],
+                ['재활의학과','재활의학과','1·2과'],['신경외과','신경외과']],
+  sex:         [['남','남'],['여','여']],
+  age_group:   [['20대','20대'],['30대','30대'],['40대','40대'],
+                ['50대','50대'],['60대','60대'],['70대 이상','70대 이상']],
+  stay_length: [['2주 미만','2주 미만'],['2~4주','2~4주'],['1개월 이상','1개월 이상']],
+  referral:    [['외래','본원 외래 진료 후 입원'],['전원','타 병원에서 전원'],
+                ['추천','지인·가족 추천'],['검색','인터넷 검색'],['기타','기타']],
+  rooms:       [['물리치료실','물리치료실'],['도수치료실','도수치료실'],
+                ['운동치료실','운동치료실'],['작업치료실','작업치료실']],
+  fall_edu:    [['예','예'],['아니오','아니오'],['기억나지 않음','기억나지 않음']]
+};
+
+const LIKERT = [
+  ['q1','진료','주치의는 환자의 상태에 대해 친절하게 설명해 주었습니까?'],
+  ['q2','진료','주치의는 치료 계획과 검사 결과를 이해하기 쉽게 설명해 주었습니까?'],
+  ['q3','간호','간호사는 친절하였습니까?'],
+  ['q4','간호','간호사는 질문에 대해 충분히 설명해 주었습니까?'],
+  ['q5','원무','원무 직원은 친절하였습니까?'],
+  ['q6','원무','입·퇴원 수속은 신속하고 편리하였습니까?'],
+  ['q7','치료','받으신 치료의 내용에 만족하십니까?'],
+  ['q8','치료','치료사는 친절하였습니까?'],
+  ['q9','치료','치료 시간은 충분하였습니까?'],
+  ['q10','영양','병원에서 제공되는 식사에 만족하십니까?'],
+  ['q11','환경','공동생활환경(샤워실, 화장실, 휴식공간)은 청결하였습니까?'],
+  ['q12','퇴원','퇴원 시 안내(복약, 외래 예약, 주의사항)는 충분하였습니까?'],
+  ['q13','전반','병원에서 제공하는 서비스에 전반적으로 만족하십니까?']
+];
+
+// 필수 문항 (rooms, free_text 제외)
+const REQUIRED = ['ward','dept','sex','age_group','stay_length','referral',
+                  ...LIKERT.map(x=>x[0]), 'nps', 'fall_edu'];
+
+/* ============================================================
+   3. 상태
+   ============================================================ */
+const state = { rooms: [], assisted: false };
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const params   = new URLSearchParams(location.search);
+const qrWard   = params.get('ward');
+state.assisted = params.get('assisted') === '1';
+
+/* ============================================================
+   4. 렌더링
+   ============================================================ */
+function makeOpt(val, label, sub, cls){
+  const d = document.createElement('div');
+  d.className = 'opt' + (cls ? ' ' + cls : '');
+  d.dataset.val = val;
+  d.innerHTML = sub ? `<span>${label}<span class="sub">${sub}</span></span>` : label;
+  return d;
+}
+
+// 단일/다중 선택 문항
+document.querySelectorAll('.q[data-key]').forEach(q => {
+  const key  = q.dataset.key;
+  const box  = q.querySelector('.opts');
+  if (!box || key === 'nps') return;
+
+  const cls = (key === 'referral') ? '' : (key === 'age_group' ? 'sm' : '');
+  CHOICES[key].forEach(([v, l, s]) => box.appendChild(makeOpt(v, l, s, cls)));
+
+  box.addEventListener('click', e => {
+    const el = e.target.closest('.opt');
+    if (!el) return;
+    q.classList.remove('miss');
+
+    if (box.hasAttribute('data-multi')) {
+      el.classList.toggle('on');
+      state.rooms = [...box.querySelectorAll('.opt.on')].map(x => x.dataset.val);
+    } else {
+      box.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
+      el.classList.add('on');
+      state[key] = el.dataset.val;
+    }
+    updateProgress();
+  });
+});
+
+// NPS 0~10
+const npsQ  = document.querySelector('.q[data-key="nps"]');
+const npsBox = npsQ.querySelector('.opts');
+for (let i = 0; i <= 10; i++) npsBox.appendChild(makeOpt(i, i, null, 'tiny'));
+npsBox.addEventListener('click', e => {
+  const el = e.target.closest('.opt');
+  if (!el) return;
+  npsQ.classList.remove('miss');
+  npsBox.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  state.nps = Number(el.dataset.val);
+  updateProgress();
+});
+
+// 5점 척도 13문항
+const likertBox = document.getElementById('likert');
+LIKERT.forEach(([key, cat, text]) => {
+  const q = document.createElement('div');
+  q.className = 'q';
+  q.dataset.key = key;
+  q.innerHTML = `<p class="q-label"><span class="q-num">${cat}</span>${text}</p>`;
+
+  const box = document.createElement('div');
+  box.className = 'opts c5';
+  for (let i = 1; i <= 5; i++) box.appendChild(makeOpt(i, i));
+  box.addEventListener('click', e => {
+    const el = e.target.closest('.opt');
+    if (!el) return;
+    q.classList.remove('miss');
+    box.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
+    el.classList.add('on');
+    state[key] = Number(el.dataset.val);
+    updateProgress();
+  });
+
+  q.appendChild(box);
+  const lg = document.createElement('div');
+  lg.className = 'scale-legend';
+  lg.innerHTML = '<span>매우 불만족</span><span>매우 만족</span>';
+  q.appendChild(lg);
+  likertBox.appendChild(q);
+});
+
+// QR 병동 자동 선택
+if (qrWard && ['5','6','7'].includes(qrWard)) {
+  const wq = document.querySelector('.q[data-key="ward"] .opts');
+  const t  = wq.querySelector(`.opt[data-val="${qrWard}"]`);
+  if (t) { t.classList.add('on'); state.ward = qrWard; }
+}
+
+/* ============================================================
+   5. 진행률
+   ============================================================ */
+function updateProgress(){
+  const done = REQUIRED.filter(k => state[k] !== undefined).length;
+  const pct  = Math.round(100 * done / REQUIRED.length);
+  document.getElementById('progfill').style.width = pct + '%';
+  document.getElementById('progtxt').textContent = `${done} / ${REQUIRED.length} 문항`;
+}
+updateProgress();
+
+/* ============================================================
+   6. 제출
+   ============================================================ */
+const btn = document.getElementById('submit');
+
+function showError(msg){
+  document.getElementById('errbox').innerHTML = `<div class="err-line">${msg}</div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finish(title, body, ico){
+  document.getElementById('app').classList.add('hide');
+  document.getElementById('bar').classList.add('hide');
+  const d = document.getElementById('done');
+  d.classList.remove('hide');
+  d.innerHTML = `<div class="msg"><div class="ico">${ico}</div>
+    <h2>${title}</h2><p>${body}</p></div>`;
+}
+
+btn.addEventListener('click', async () => {
+  document.getElementById('errbox').innerHTML = '';
+
+  const missing = REQUIRED.filter(k => state[k] === undefined);
+  if (missing.length) {
+    document.querySelectorAll('.q').forEach(q => q.classList.remove('miss'));
+    missing.forEach(k => {
+      const q = document.querySelector(`.q[data-key="${k}"]`);
+      if (q) q.classList.add('miss');
+    });
+    const first = document.querySelector(`.q[data-key="${missing[0]}"]`);
+    if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    showError(`응답하지 않은 문항이 ${missing.length}개 있습니다`);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '제출 중…';
+
+  const payload = {
+    ward: state.ward, dept: state.dept, sex: state.sex,
+    age_group: state.age_group, stay_length: state.stay_length,
+    referral: state.referral, rooms: state.rooms,
+    nps: state.nps, fall_edu: state.fall_edu,
+    free_text: document.getElementById('free_text').value.trim(),
+    assisted: state.assisted
+  };
+  LIKERT.forEach(([k]) => payload[k] = state[k]);
+
+  try {
+    const { data, error } = await sb.rpc('submit_survey', { payload });
+    if (error) throw error;
+
+    try { localStorage.setItem(PERIOD_KEY, '1'); } catch(e){}
+    finish('제출이 완료되었습니다',
+      '소중한 의견 감사합니다.<br>더 나은 병원이 되도록 노력하겠습니다.', '✓');
+
+  } catch (err) {
+    const m = String(err.message || err);
+    if (m.includes('SURVEY_CLOSED')) {
+      finish('현재 조사 기간이 아닙니다', '조사 기간에 다시 참여해 주세요.', '🗓');
+    } else if (m.includes('RATE_LIMITED')) {
+      showError('잠시 후 다시 시도해 주세요');
+      btn.disabled = false; btn.textContent = '제출하기';
+    } else {
+      showError('제출에 실패했습니다. 잠시 후 다시 시도해 주세요');
+      btn.disabled = false; btn.textContent = '제출하기';
+    }
+  }
+});
+
+/* ============================================================
+   7. 진입 시 상태 확인
+   ============================================================ */
+(async () => {
+  // 중복 제출 방지 (같은 기기 · 같은 반기)
+  try {
+    if (localStorage.getItem(PERIOD_KEY) && !state.assisted) {
+      finish('이미 참여하셨습니다', '소중한 의견 감사합니다.', '✓');
+      return;
+    }
+  } catch(e){}
+
+  // 조사 기간 확인
+  try {
+    const { data } = await sb.rpc('get_survey_status');
+    if (data && data.is_open === false) {
+      finish('현재 조사 기간이 아닙니다', '조사 기간에 다시 참여해 주세요.', '🗓');
+    }
+  } catch(e){}
+})();
+</script>
+</body>
+</html>
