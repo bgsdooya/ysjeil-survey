@@ -204,13 +204,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ============================================================
-   1. 설정 — 아래 두 줄만 채우세요
+   1. 설정
    ============================================================ */
 const SUPABASE_URL  = 'https://zxommpndvpcakzxllebs.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4b21tcG5kdnBjYWt6eGxsZWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NzU5NzMsImV4cCI6MjA5OTE1MTk3M30.YGMhMk899JyJ0vmWENkHHrRtibywmw599gZlf4L-qVM';
 
-const SUBMIT_KEY   = 'ysjeil_survey_last';   // 반기 바뀌어도 수정 불필요
-const COOLDOWN_DAY = 90;    
+const SUBMIT_KEY   = 'ysjeil_survey_last';   // 회차가 바뀌어도 수정 불필요
+const COOLDOWN_DAY = 90;                     // 퇴원 후 재참여 허용까지 대기 일수
 
 /* ============================================================
    2. 문항 정의
@@ -421,9 +421,9 @@ btn.addEventListener('click', async () => {
     } else if (m.includes('RATE_LIMITED')) {
       showError('잠시 후 다시 시도해 주세요');
       btn.disabled = false; btn.textContent = '제출하기';
-} else {
+    } else {
       showError('제출에 실패했습니다. 잠시 후 다시 시도해 주세요');
-  btn.disabled = false; btn.textContent = '제출하기';
+      btn.disabled = false; btn.textContent = '제출하기';
     }
   }
 });
@@ -434,14 +434,14 @@ btn.addEventListener('click', async () => {
 (async () => {
   // 중복 제출 방지 (같은 기기 · 최근 90일)
   try {
-  const last = Number(localStorage.getItem(SUBMIT_KEY) || 0);
-  const days = (Date.now() - last) / 86400000;
-  if (last && days < COOLDOWN_DAY) {
-    finish('이미 참여하셨습니다',
-      '최근 3개월 이내에 참여해 주셨습니다.<br>소중한 의견 감사합니다.', '✓');
-    return;
-  }
-} catch(e){}
+    const last = Number(localStorage.getItem(SUBMIT_KEY) || 0);
+    const days = (Date.now() - last) / 86400000;
+    if (last && days < COOLDOWN_DAY) {
+      finish('이미 참여하셨습니다',
+        '최근 3개월 이내에 참여해 주셨습니다.<br>소중한 의견 감사합니다.', '✓');
+      return;
+    }
+  } catch(e){}
 
   // 조사 기간 확인
   try {
