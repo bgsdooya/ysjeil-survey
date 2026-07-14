@@ -421,9 +421,10 @@ updateProgress();
    ============================================================ */
 const btn = document.getElementById('submit');
 
-function showError(msg){
+function showError(msg, keepScroll){
   document.getElementById('errbox').innerHTML = `<div class="err-line">${msg}</div>`;
-  }
+  if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 function finish(title, body, ico){
   document.getElementById('app').classList.add('hide');
@@ -449,7 +450,7 @@ btn.addEventListener('click', async () => {
       const y = first.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top: y, behavior:'auto' });
     }
-    showError(`응답하지 않은 문항이 ${missing.length}개 있습니다`);
+    showError(`응답하지 않은 문항이 ${missing.length}개 있습니다`, true);
     return;
   }
 
