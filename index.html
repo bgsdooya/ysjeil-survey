@@ -16,28 +16,56 @@
     --r:10px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  /* 폰트 배율 기준: html font-size를 바꾸면 rem 요소 전체가 함께 커진다 */
+  html{ font-size:17px; }              /* 보통 */
+  html.fs-lg{ font-size:19.5px; }      /* 크게 */
+  html.fs-xl{ font-size:22px; }        /* 아주 크게 */
   body{
     margin:0; background:var(--bg); color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
-    font-size:16px; line-height:1.6; padding-bottom:96px;
+    font-size:1rem; line-height:1.6; padding-bottom:6rem;
   }
+
+  /* 글자 크기 조절 버튼 (우측 상단 고정) */
+  .fontctl{
+    position:fixed; top:10px; right:10px; z-index:30;
+    display:flex; align-items:center; gap:6px;
+    background:var(--card); border:1px solid var(--line2);
+    border-radius:24px; padding:6px 10px; box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .fontctl button{
+    border:none; background:var(--pri-bg); color:var(--pri);
+    font-family:inherit; font-weight:700; cursor:pointer;
+    border-radius:16px; padding:6px 11px; line-height:1;
+  }
+  .fontctl .lbl{ font-size:12px; color:var(--txt3); min-width:44px; text-align:center; }
   .wrap{max-width:520px; margin:0 auto; padding:16px;}
+  .wrap > header:first-child{ padding-top:30px; }
 
   header{background:var(--card); border-radius:var(--r); padding:24px 20px; text-align:center; margin-bottom:14px; border:1px solid var(--line);}
-  header h1{font-size:20px; font-weight:600; margin:0 0 10px;}
-  header p{font-size:13px; color:var(--txt2); margin:0; line-height:1.7;}
-  .badge{display:inline-block; background:var(--pri-bg); color:var(--pri); font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:12px;}
+  header h1{font-size:1.25rem; font-weight:600; margin:0 0 10px;}
+  header p{font-size:0.82rem; color:var(--txt2); margin:0; line-height:1.7;}
+  .badge{display:inline-block; background:var(--pri-bg); color:var(--pri); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:12px;}
 
   section{background:var(--card); border-radius:var(--r); padding:18px 16px; margin-bottom:14px; border:1px solid var(--line);}
-  .sec-title{font-size:13px; font-weight:700; color:var(--pri); margin:0 0 4px; letter-spacing:.02em;}
-  .sec-desc{font-size:12px; color:var(--txt3); margin:0 0 16px;}
+  .sec-title{font-size:0.82rem; font-weight:700; color:var(--pri); margin:0 0 4px; letter-spacing:.02em;}
+  .sec-desc{font-size:0.78rem; color:var(--txt3); margin:0 0 16px;}
 
   .q{padding:14px 0; border-top:1px solid var(--line);}
   .q:first-of-type{border-top:none; padding-top:0;}
-  .q.miss{background:var(--err-bg); margin:0 -16px; padding-left:16px; padding-right:16px; border-radius:6px;}
-  .q-label{font-size:15px; margin:0 0 10px; display:flex; gap:8px; align-items:flex-start;}
-  .q-num{font-size:11px; font-weight:700; color:var(--pri); background:var(--pri-bg); padding:3px 7px; border-radius:5px; flex-shrink:0; margin-top:2px;}
-  .q-hint{font-size:12px; color:var(--txt3); margin:-4px 0 10px;}
+  .q.miss{
+    background:var(--err-bg); margin:0 -16px; padding:14px 16px;
+    border-radius:8px; box-shadow:0 0 0 2px var(--err) inset;
+    animation:shake .35s;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%,60%{transform:translateX(-6px);}
+    40%,80%{transform:translateX(6px);}
+  }
+  .q-label{font-size:0.95rem; margin:0 0 10px; display:flex; gap:8px; align-items:flex-start;}
+  .q-num{font-size:0.7rem; font-weight:700; color:var(--pri); background:var(--pri-bg); padding:3px 7px; border-radius:5px; flex-shrink:0; margin-top:2px;}
+  .q-hint{font-size:0.78rem; color:var(--txt3); margin:-4px 0 10px;}
 
   .opts{display:grid; gap:7px;}
   .opts.c2{grid-template-columns:1fr 1fr;}
@@ -49,23 +77,23 @@
     min-height:48px; display:flex; align-items:center; justify-content:center;
     text-align:center; padding:10px 8px; border:1.5px solid var(--line2);
     border-radius:var(--r); background:#fff; color:var(--txt2);
-    font-size:14px; cursor:pointer; user-select:none; transition:.08s;
+    font-size:0.9rem; cursor:pointer; user-select:none; transition:.08s;
   }
-  .opt.sm{font-size:13px; padding:8px 4px;}
-  .opt.tiny{min-height:44px; font-size:13px; padding:8px 0; border-radius:6px;}
+  .opt.sm{font-size:0.82rem; padding:8px 4px;}
+  .opt.tiny{min-height:44px; font-size:0.82rem; padding:8px 0; border-radius:6px;}
   .opt:active{transform:scale(.97);}
   .opt.on{background:var(--pri); border-color:var(--pri); color:#fff; font-weight:600;}
-  .opt .sub{display:block; font-size:11px; opacity:.7; margin-top:1px;}
+  .opt .sub{display:block; font-size:0.7rem; opacity:.7; margin-top:1px;}
 
-  .scale-legend{display:flex; justify-content:space-between; font-size:11px; color:var(--txt3); margin-top:5px;}
+  .scale-legend{display:flex; justify-content:space-between; font-size:0.7rem; color:var(--txt3); margin-top:5px;}
 
   textarea{
     width:100%; border:1.5px solid var(--line2); border-radius:var(--r);
-    padding:12px; font-size:15px; font-family:inherit; resize:vertical; min-height:96px;
+    padding:12px; font-size:0.95rem; font-family:inherit; resize:vertical; min-height:96px;
     color:var(--txt); background:#fff;
   }
   textarea:focus{outline:none; border-color:var(--pri);}
-  .warn{font-size:12px; color:var(--err); margin:8px 0 0;}
+  .warn{font-size:0.78rem; color:var(--err); margin:8px 0 0;}
 
   .bar{
     position:fixed; left:0; right:0; bottom:0; background:var(--card);
@@ -74,10 +102,10 @@
   .bar-inner{max-width:520px; margin:0 auto;}
   .prog{height:5px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:9px;}
   .prog i{display:block; height:100%; width:0; background:var(--pri); transition:width .2s;}
-  .prog-txt{font-size:12px; color:var(--txt2); text-align:center; margin-bottom:9px;}
+  .prog-txt{font-size:0.78rem; color:var(--txt2); text-align:center; margin-bottom:9px;}
   button.submit{
     width:100%; min-height:52px; border:none; border-radius:var(--r);
-    background:var(--pri); color:#fff; font-size:16px; font-weight:600;
+    background:var(--pri); color:#fff; font-size:1rem; font-weight:600;
     font-family:inherit; cursor:pointer;
   }
   button.submit:disabled{background:var(--line2); cursor:not-allowed;}
@@ -85,13 +113,18 @@
 
   .msg{text-align:center; padding:60px 24px;}
   .msg .ico{font-size:52px; margin-bottom:16px;}
-  .msg h2{font-size:20px; margin:0 0 10px;}
-  .msg p{font-size:14px; color:var(--txt2); margin:0; line-height:1.8;}
+  .msg h2{font-size:1.25rem; margin:0 0 10px;}
+  .msg p{font-size:0.9rem; color:var(--txt2); margin:0; line-height:1.8;}
   .hide{display:none !important;}
-  .err-line{background:var(--err-bg); color:var(--err); font-size:13px; padding:10px 12px; border-radius:8px; margin-bottom:10px; text-align:center;}
+  .err-line{background:var(--err-bg); color:var(--err); font-size:0.82rem; padding:10px 12px; border-radius:8px; margin-bottom:10px; text-align:center;}
 </style>
 </head>
 <body>
+
+<div class="fontctl" id="fontctl">
+  <span class="lbl" id="fslbl">보통</span>
+  <button id="fsbtn">가<span style="font-size:1.3em">+</span></button>
+</div>
 
 <div id="app" class="wrap">
 
@@ -211,6 +244,31 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 const SUBMIT_KEY   = 'ysjeil_survey_last';   // 회차가 바뀌어도 수정 불필요
 const COOLDOWN_DAY = 90;                     // 퇴원 후 재참여 허용까지 대기 일수
+
+/* ============================================================
+   1-2. 글자 크기 조절 (보통 / 크게 / 아주 크게)
+   ============================================================ */
+const FS_STEPS = [
+  { cls:'',      label:'보통' },
+  { cls:'fs-lg', label:'크게' },
+  { cls:'fs-xl', label:'아주 크게' }
+];
+let fsIdx = 0;
+try { fsIdx = Number(localStorage.getItem('ysjeil_fs') || 0); } catch(e){}
+if (!(fsIdx >= 0 && fsIdx < FS_STEPS.length)) fsIdx = 0;
+
+function applyFont(){
+  const html = document.documentElement;
+  html.classList.remove('fs-lg','fs-xl');
+  if (FS_STEPS[fsIdx].cls) html.classList.add(FS_STEPS[fsIdx].cls);
+  document.getElementById('fslbl').textContent = FS_STEPS[fsIdx].label;
+  try { localStorage.setItem('ysjeil_fs', String(fsIdx)); } catch(e){}
+}
+document.getElementById('fsbtn').addEventListener('click', () => {
+  fsIdx = (fsIdx + 1) % FS_STEPS.length;
+  applyFont();
+});
+applyFont();
 
 /* ============================================================
    2. 문항 정의
@@ -388,7 +446,10 @@ btn.addEventListener('click', async () => {
       if (q) q.classList.add('miss');
     });
     const first = document.querySelector(`.q[data-key="${missing[0]}"]`);
-    if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    if (first) {
+      const y = first.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior:'auto' });
+    }
     showError(`응답하지 않은 문항이 ${missing.length}개 있습니다`);
     return;
   }
