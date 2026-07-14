@@ -120,6 +120,24 @@
   .txtitem .meta{font-size:11.5px; color:var(--txt3); margin-bottom:5px;}
   .txtitem .meta b{color:var(--txt2); font-weight:600;}
   .txtitem p{margin:0; font-size:14px; line-height:1.7; white-space:pre-wrap;}
+  .txtitem{display:flex; gap:10px; align-items:flex-start;}
+  .txtitem .body{flex:1;}
+  .flagbtn{
+    flex-shrink:0; width:30px; height:30px; border:1.5px solid var(--line2);
+    border-radius:7px; background:#fff; cursor:pointer; font-size:15px; line-height:1;
+    color:var(--txt3); display:flex; align-items:center; justify-content:center;
+    margin-top:2px; transition:.1s;
+  }
+  .flagbtn.on{ background:#fff6e0; border-color:#f0b429; color:#f0932b; }
+  .txtitem.flagged{ background:#fffdf5; margin:0 -8px; padding:14px 8px; border-radius:8px; }
+  .txttools{display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap;}
+  .txttools button{
+    padding:7px 14px; border:1.5px solid var(--line2); border-radius:20px;
+    font-size:13px; cursor:pointer; background:#fff; color:var(--txt2); font-family:inherit;
+  }
+  .txttools button.on{ background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600; }
+  .txttools .cnt{ font-size:12.5px; color:var(--txt3); margin-left:auto; }
+  .grouphead{font-size:12px; font-weight:700; color:#b9770c; margin:4px 0 10px; letter-spacing:.02em;}
   .score{display:inline-block; padding:1px 7px; border-radius:4px; font-weight:700; font-size:11px;}
 
   .empty{text-align:center; padding:56px 20px; color:var(--txt3); font-size:14px;}
@@ -177,7 +195,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 // ⚠️ 새 회차를 시작하면 반드시 여기에 추가할 것.
 //    누락 시 해당 회차 데이터가 대시보드에 표시되지 않음.
-const PERIODS = ['2026-1기', '2027-1기', '2027-2기'];   // 반기 추가 시 여기 수정
+const PERIODS = ['2026-1기', '2027-1기', '2027-2기'];
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -206,7 +224,6 @@ let charts = {};
    유틸
    ============================================================ */
 const $  = s => document.querySelector(s);
-const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
 const pane = p => document.querySelector(`.pane[data-p="${p}"]`);
 
 // 1~5 점수 → 배경색
@@ -282,7 +299,7 @@ async function enter(){
   $('#login').classList.add('hide');
   $('#dash').classList.remove('hide');
 
-  // 반기 셀렉트
+  // 회차 셀렉트
   const sel = $('#period');
   sel.innerHTML = PERIODS.map(p => `<option value="${p}">${p}</option>`).join('');
   sel.addEventListener('change', () => { period = sel.value; render(); });
@@ -594,7 +611,7 @@ async function renderRoom(){
   });
 }
 
-/* ---------- 6. 반기 비교 ---------- */
+/* ---------- 6. 회차 비교 ---------- */
 function renderCompareShell(){
   const p = pane('compare');
   const i = PERIODS.indexOf(period);
@@ -610,7 +627,7 @@ function renderCompareShell(){
     </div>
     <div class="warnbox">
       기존 종이 설문은 3점 척도였으므로 비교 대상이 아닙니다.
-  <b>2026-1기가 기준선(baseline)</b>입니다.
+      <b>2026-1기가 기준선(baseline)</b>입니다.
     </div>
     <div id="cmpBody"></div>`;
 
@@ -677,6 +694,21 @@ async function loadCompare(){
 }
 
 /* ---------- 7. 자유 의견 ---------- */
+let textData = [];
+let textOnlyFlagged = false;
+
+// 체크 표시는 이 브라우저에만 저장됨 (localStorage)
+function flagKey(){ return 'ysjeil_flag_' + period; }
+function loadFlags(){
+  try { return new Set(JSON.parse(localStorage.getItem(flagKey()) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function saveFlags(set){
+  try { localStorage.setItem(flagKey(), JSON.stringify([...set])); } catch(e){}
+}
+// created_at 을 안정적 식별자로 사용
+function rowKey(r){ return r.created_at; }
+
 async function renderText(){
   const p = pane('text');
   const { data, error } = await sb.rpc('admin_free_text', { p_period: period, p_limit: 200 });
@@ -686,28 +718,81 @@ async function renderText(){
       emptyMsg(error ? '불러오지 못했습니다' : '작성된 의견이 없습니다');
     return;
   }
+  textData = data;
+  paintText();
+}
 
-  const items = data.map(r => {
-    const d = new Date(r.created_at);
-    const ds = `${d.getMonth()+1}/${d.getDate()}`;
-    const sc = r.avg_score;
-    return `<div class="txtitem">
+function itemHTML(r, flagged){
+  const d = new Date(r.created_at);
+  const ds = `${d.getMonth()+1}/${d.getDate()}`;
+  const sc = r.avg_score;
+  const k = rowKey(r);
+  return `<div class="txtitem ${flagged?'flagged':''}" data-k="${k}">
+    <button class="flagbtn ${flagged?'on':''}" data-k="${k}" title="회의 보고용으로 체크">${flagged?'★':'☆'}</button>
+    <div class="body">
       <p class="meta">
         <b>${r.ward}병동</b> · ${r.dept} · ${r.age_group} · ${ds}
         <span class="score" style="background:${scoreColor(sc)};color:${scoreText(sc)}">평균 ${sc}</span>
       </p>
       <p>${(r.free_text||'').replace(/</g,'&lt;')}</p>
-    </div>`;
-  }).join('');
+    </div>
+  </div>`;
+}
+
+function paintText(){
+  const p = pane('text');
+  const flags = loadFlags();
+  const flaggedRows = textData.filter(r => flags.has(rowKey(r)));
+  const otherRows   = textData.filter(r => !flags.has(rowKey(r)));
+
+  let body = '';
+  if (textOnlyFlagged){
+    body = flaggedRows.length
+      ? flaggedRows.map(r => itemHTML(r, true)).join('')
+      : `<div class="empty">체크한 의견이 없습니다</div>`;
+  } else {
+    if (flaggedRows.length){
+      body += `<p class="grouphead">★ 회의 보고용 (${flaggedRows.length})</p>`;
+      body += flaggedRows.map(r => itemHTML(r, true)).join('');
+      body += `<div style="height:8px"></div>`;
+    }
+    body += otherRows.map(r => itemHTML(r, false)).join('');
+  }
 
   p.innerHTML = `
     <h2 class="sec">자유 의견</h2>
-    <p class="note">${period} · ${data.length}건 · 최근 순</p>
-    <div class="warnbox">
-      개인정보(이름·연락처)나 특정 직원 실명이 포함된 응답은
-      <b>사전에 정한 기준에 따라 처리</b>하십시오. 이 화면은 열람 기록이 남습니다.
+    <p class="note">${period} · 총 ${textData.length}건 · 체크한 항목은 상단에 모입니다</p>
+    <div class="txttools">
+      <button id="flagAll" class="${textOnlyFlagged?'on':''}">★ 체크만 보기</button>
+      <button id="flagClear">체크 전체 해제</button>
+      <span class="cnt">★ ${flaggedRows.length} / ${textData.length}</span>
     </div>
-    <div class="panel">${items}</div>`;
+    <div class="warnbox">
+      체크 표시는 <b>이 브라우저(이 PC)에만 저장</b>됩니다. 발표 전 미리 체크해 두세요.<br>
+      개인정보나 특정 직원 실명이 포함된 응답은 사전에 정한 기준에 따라 처리하십시오.
+    </div>
+    <div class="panel">${body}</div>`;
+
+  // 체크 토글
+  p.querySelectorAll('.flagbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const set = loadFlags();
+      const k = btn.dataset.k;
+      if (set.has(k)) set.delete(k); else set.add(k);
+      saveFlags(set);
+      paintText();
+    });
+  });
+  // 체크만 보기
+  p.querySelector('#flagAll').addEventListener('click', () => {
+    textOnlyFlagged = !textOnlyFlagged; paintText();
+  });
+  // 전체 해제
+  p.querySelector('#flagClear').addEventListener('click', () => {
+    if (confirm('이 회차의 체크를 모두 해제할까요?')){
+      saveFlags(new Set()); textOnlyFlagged = false; paintText();
+    }
+  });
 }
 
 /* ============================================================
